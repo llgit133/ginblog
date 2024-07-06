@@ -4,7 +4,6 @@ import (
 	v1 "ginblog/api/v1"
 	"ginblog/utils"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 // InitRouter （可跨包） initRouter（私有方法，只能包内） 大小写问题
@@ -16,18 +15,11 @@ func InitRouter() {
 	routerV1 := r.Group("api/v1")
 	{
 		//http://localhost:3000/api/v1/hello
-		routerV1.GET("hello", func(context *gin.Context) {
-			context.JSON(http.StatusOK, gin.H{
-				"code": 200,
-				"msg":  "success",
-				"data": "hello ginblog",
-			})
-
-		})
 
 		// 用户模块的路由
 		routerV1.POST("user/add", v1.AddUser)
 		routerV1.GET("users", v1.GetUsers)
+		// http://localhost:3000/api/v1//user/2  软删除
 		routerV1.PUT("user/:id", v1.EditUser)
 		routerV1.DELETE("user/:id", v1.DeleteUser)
 
