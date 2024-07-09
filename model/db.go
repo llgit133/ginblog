@@ -23,7 +23,7 @@ func InitDb() {
 		fmt.Println("连接数据库失败", err)
 	}
 
-	// 自动迁移
+	// 自动迁移 表名user和struct User之间的映射关系
 	db.AutoMigrate(&User{}, &Category{}, &Article{})
 	// 禁用表名的复数形式 比如 User ->users
 	db.SingularTable(true)

@@ -41,6 +41,7 @@ func CreateUser(data *User) int {
 
 // 查询用户列表
 // 返回User切片
+// select * from user limit 10 offset 10
 func GetUsers(pageSize int, pageNum int) []User {
 
 	var users []User
@@ -85,6 +86,8 @@ func (u *User) BeforeSave() {
 	u.Password = ScryptPassword(u.Password)
 }
 
+// DeleteUser 删除用户
+// DELETE FROM users WHERE id = 1;
 func DeleteUser(id int) int {
 
 	var user User

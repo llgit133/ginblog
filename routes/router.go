@@ -24,10 +24,10 @@ func InitRouter() {
 		routerV1.DELETE("user/:id", v1.DeleteUser)
 
 		// 分类模块的路由
+		routerV1.GET("categories", v1.GetCate)
 		routerV1.POST("category/add", v1.AddCategory)
-		routerV1.GET("categorys", v1.GetCategorys)
-		routerV1.PUT("category/:id", v1.EditCategory)
-		routerV1.DELETE("category/:id", v1.DeleteCategory)
+		routerV1.PUT("category/:id", v1.EditCate)
+		routerV1.DELETE("category/:id", v1.DeleteCate)
 
 		// 文章模块的路由
 		routerV1.POST("article/add", v1.AddArticles)
