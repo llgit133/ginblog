@@ -43,7 +43,7 @@ func InitRouter() {
 		后台管理路由接口
 	*/
 	auth := r.Group("api/v1")
-	auth.Use(middleware.JwtToken())
+	auth.Use(middleware.JwtToken()) // 用户token验证
 	{
 		// 用户模块的路由接口
 		auth.GET("admin/users", v1.GetUsers)

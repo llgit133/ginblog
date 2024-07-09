@@ -41,7 +41,14 @@ func GetCommentList(pageSize int, pageNum int) ([]Comment, int64, int) {
 	var commentList []Comment
 	var total int64
 	db.Find(&commentList).Count(&total)
-	err = db.Model(&commentList).Limit(pageSize).Offset((pageNum - 1) * pageSize).Order("Created_At DESC").Select("comment.id, article.title,user_id,article_id, user.username, comment.content, comment.status,comment.created_at,comment.deleted_at").Joins("LEFT JOIN article ON comment.article_id = article.id").Joins("LEFT JOIN user ON comment.user_id = user.id").Scan(&commentList).Error
+	err = db.Model(&commentList).
+		Limit(pageSize).
+		Offset((pageNum - 1) * pageSize).
+		Order("Created_At DESC").
+		Select("comment.id, article.title,user_id,article_id, user.username, comment.content, comment.status,comment.created_at,comment.deleted_at").
+		Joins("LEFT JOIN article ON comment.article_id = article.id").
+		Joins("LEFT JOIN user ON comment.user_id = user.id").
+		Scan(&commentList).Error
 	if err != nil {
 		return commentList, 0, errmsg.ERROR
 	}
@@ -61,8 +68,16 @@ func GetCommentListFront(id int, pageSize int, pageNum int) ([]Comment, int64, i
 	var commentList []Comment
 	var total int64
 	db.Find(&Comment{}).Where("article_id = ?", id).Where("status = ?", 1).Count(&total)
-	err = db.Model(&Comment{}).Limit(pageSize).Offset((pageNum-1)*pageSize).Order("Created_At DESC").Select("comment.id, article.title, user_id, article_id, user.username, comment.content, comment.status,comment.created_at,comment.deleted_at").Joins("LEFT JOIN article ON comment.article_id = article.id").Joins("LEFT JOIN user ON comment.user_id = user.id").Where("article_id = ?",
-		id).Where("status = ?", 1).Scan(&commentList).Error
+	err = db.Model(&Comment{}).
+		Limit(pageSize).
+		Offset((pageNum-1)*pageSize).
+		Order("Created_At DESC").
+		Select("comment.id, article.title, user_id, article_id, user.username, comment.content, comment.status,comment.created_at,comment.deleted_at").
+		Joins("LEFT JOIN article ON comment.article_id = article.id").
+		Joins("LEFT JOIN user ON comment.user_id = user.id").
+		Where("article_id = ?", id).
+		Where("status = ?", 1).
+		Scan(&commentList).Error
 	if err != nil {
 		return commentList, 0, errmsg.ERROR
 	}

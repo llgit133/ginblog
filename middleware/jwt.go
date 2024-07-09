@@ -15,6 +15,7 @@ type JWT struct {
 }
 
 func NewJWT() *JWT {
+	// 把JwtKey 解析为字节数组
 	return &JWT{
 		[]byte(utils.JwtKey),
 	}
@@ -63,7 +64,12 @@ func (j *JWT) ParserToken(tokenString string) error {
 func JwtToken() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var code int
+
+		// token格式
+		// "Authorization":"Bearer XXXXXXXXX"
 		tokenHeader := c.Request.Header.Get("Authorization")
+
+		// tokenHeader 为空
 		if tokenHeader == "" {
 			code = errmsg.ERROR_TOKEN_EXIST
 			c.JSON(http.StatusOK, gin.H{
@@ -74,6 +80,9 @@ func JwtToken() gin.HandlerFunc {
 			return
 		}
 
+		// checkToken string数组 长度为2
+		// checkToken[0] = "Bearer"
+		// checkToken[1] = "XXXXXXXXXX"
 		checkToken := strings.Split(tokenHeader, " ")
 		if len(checkToken) == 0 {
 			c.JSON(http.StatusOK, gin.H{
@@ -93,8 +102,9 @@ func JwtToken() gin.HandlerFunc {
 			return
 		}
 
+		//创建一个新的 JWT 实例 j
 		j := NewJWT()
-		// 解析token
+		// 解析token checkToken[1] 看是否过期
 		err := j.ParserToken(checkToken[1])
 		if err != nil {
 			if errors.Is(err, TokenExpired) {

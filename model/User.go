@@ -147,6 +147,7 @@ func CheckLogin(username string, password string) (User, int) {
 
 	db.Where("username = ?", username).First(&user)
 
+	// 密码加密 对比密码  后端取到的密码user.Password、前端的密码传输password
 	PasswordErr = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 
 	if user.ID == 0 {

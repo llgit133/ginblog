@@ -24,6 +24,9 @@ func AddArticle(c *gin.Context) {
 
 // GetCateArt 查询分类下的所有文章
 func GetCateArt(c *gin.Context) {
+	// strconv 字符串转换为int
+	// Query  URL是http://example.com/users?pagenum=2&size=10中，pagenum和size就是Query参数
+	// Param  URL是http://example.com//user/123，那么123就是id这个路径参数的值
 	pageSize, _ := strconv.Atoi(c.Query("pagesize"))
 	pageNum, _ := strconv.Atoi(c.Query("pagenum"))
 	id, _ := strconv.Atoi(c.Param("id"))
@@ -62,6 +65,9 @@ func GetArtInfo(c *gin.Context) {
 
 // GetArt 查询文章列表
 func GetArt(c *gin.Context) {
+
+	// strconv 字符串转换为int
+	// title 不用转换
 	pageSize, _ := strconv.Atoi(c.Query("pagesize"))
 	pageNum, _ := strconv.Atoi(c.Query("pagenum"))
 	title := c.Query("title")
@@ -76,6 +82,7 @@ func GetArt(c *gin.Context) {
 	if pageNum == 0 {
 		pageNum = 1
 	}
+	// 不传title字段时，查询所有文章
 	if len(title) == 0 {
 		data, code, total := model.GetArt(pageSize, pageNum)
 		c.JSON(http.StatusOK, gin.H{
@@ -87,6 +94,7 @@ func GetArt(c *gin.Context) {
 		return
 	}
 
+	// 传title字段时，查询标题包含title的文章
 	data, code, total := model.SearchArticle(title, pageSize, pageNum)
 	c.JSON(http.StatusOK, gin.H{
 		"status":  code,
@@ -99,7 +107,18 @@ func GetArt(c *gin.Context) {
 // EditArt 编辑文章
 func EditArt(c *gin.Context) {
 	var data model.Article
+
+	//请求路由：article/1
 	id, _ := strconv.Atoi(c.Param("id"))
+
+	// 前端JSON绑定 后端的Article结构
+	//{
+	//  "title": "示例标题-put",
+	//  "cid": 1,
+	//  "desc": "这是一个示例描述，它可能会很长但不超过200个字符。",
+	//  "content": "这是内容字段，它可以包含大量的文本信息，用于详细描述标题和描述中没有提到的详细信息。",
+	//  "img": "https://example.com/image.jpg"
+	//}
 	_ = c.ShouldBindJSON(&data)
 
 	code := model.EditArt(id, &data)

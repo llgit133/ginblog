@@ -18,6 +18,7 @@ type Article struct {
 }
 
 // CreateArt 新增文章
+// insert into article (title,cid,desc,content,img) values (?,?,?,?,?)
 func CreateArt(data *Article) int {
 	err := db.Create(&data).Error
 	if err != nil {
@@ -27,12 +28,23 @@ func CreateArt(data *Article) int {
 }
 
 // GetCateArt 查询分类下的所有文章
+// select * from article where cid = ? limit ? offset ?
 func GetCateArt(id int, pageSize int, pageNum int) ([]Article, int, int64) {
 	var cateArtList []Article
 	var total int64
 
-	err = db.Preload("Category").Limit(pageSize).Offset((pageNum-1)*pageSize).Where(
-		"cid =?", id).Find(&cateArtList).Error
+	//这两段代码的组合通常用于分页显示数据：
+	//SQL1 获取当前页的数据， SELECT * FROM articles WHERE cid = id LIMIT pageSize OFFSET (pageNum - 1) * pageSize
+	//SQL2 获取总记录数以便于计算总页数。 SELECT COUNT(*) FROM articles WHERE cid = id
+
+	// sql1: 结果填充到cateArtList中
+	err = db.Preload("Category").
+		Limit(pageSize).
+		Offset((pageNum-1)*pageSize).
+		Where("cid =?", id).
+		Find(&cateArtList).
+		Error
+	// sql2: 指定查询模型cateArtList，查询的总数total
 	db.Model(&cateArtList).Where("cid =?", id).Count(&total)
 	if err != nil {
 		return nil, errmsg.ERROR_CATE_NOT_EXIST, 0
@@ -44,6 +56,8 @@ func GetCateArt(id int, pageSize int, pageNum int) ([]Article, int, int64) {
 func GetArtInfo(id int) (Article, int) {
 	var art Article
 	err = db.Where("id = ?", id).Preload("Category").First(&art).Error
+
+	//read_count字段，将其值增加1
 	db.Model(&art).Where("id = ?", id).UpdateColumn("read_count", gorm.Expr("read_count + ?", 1))
 	if err != nil {
 		return art, errmsg.ERROR_ART_NOT_EXIST
@@ -57,7 +71,13 @@ func GetArt(pageSize int, pageNum int) ([]Article, int, int64) {
 	var err error
 	var total int64
 
-	err = db.Select("article.id, title, img, created_at, updated_at, `desc`, comment_count, read_count, category.name").Limit(pageSize).Offset((pageNum - 1) * pageSize).Order("Created_At DESC").Joins("Category").Find(&articleList).Error
+	err = db.
+		Select("article.id, title, img, created_at, updated_at, `desc`, comment_count, read_count, category.name").
+		Limit(pageSize).Offset((pageNum - 1) * pageSize).
+		Order("Created_At DESC").
+		Joins("Category").
+		Find(&articleList).
+		Error
 	// 单独计数
 	db.Model(&articleList).Count(&total)
 	if err != nil {
@@ -72,13 +92,15 @@ func SearchArticle(title string, pageSize int, pageNum int) ([]Article, int, int
 	var articleList []Article
 	var err error
 	var total int64
-	err = db.Select("article.id,title, img, created_at, updated_at, `desc`, comment_count, read_count, Category.name").Order("Created_At DESC").Joins("Category").Where("title LIKE ?",
-		title+"%",
-	).Limit(pageSize).Offset((pageNum - 1) * pageSize).Find(&articleList).Error
+	err = db.
+		Select("article.id,title, img, created_at, updated_at, `desc`, comment_count, read_count, Category.name").
+		Order("Created_At DESC").Joins("Category").
+		Where("title LIKE ?", "%"+title+"%").
+		Limit(pageSize).
+		Offset((pageNum - 1) * pageSize).
+		Find(&articleList).Error
 	//单独计数
-	db.Model(&articleList).Where("title LIKE ?",
-		title+"%",
-	).Count(&total)
+	db.Model(&articleList).Where("title LIKE ?", "%"+title+"%").Count(&total)
 
 	if err != nil {
 		return nil, errmsg.ERROR, 0
