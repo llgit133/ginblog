@@ -30,10 +30,11 @@ func InitRouter() {
 		routerV1.DELETE("category/:id", v1.DeleteCate)
 
 		// 文章模块的路由
-		routerV1.POST("article/add", v1.AddArticles)
-		routerV1.GET("articles", v1.GetArticles)
-		routerV1.PUT("article/:id", v1.EditArticle)
-		routerV1.DELETE("article/:id", v1.DeleteArticles)
+		routerV1.GET("admin/article/info/:id", v1.GetArtInfo)
+		routerV1.GET("admin/article", v1.GetArt)
+		routerV1.POST("article/add", v1.AddArticle)
+		routerV1.PUT("article/:id", v1.EditArt)
+		routerV1.DELETE("article/:id", v1.DeleteArt)
 
 		// 登录模块的路由
 
