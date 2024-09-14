@@ -127,6 +127,7 @@ func JwtToken() gin.HandlerFunc {
 		}
 
 		//c.Set("username",)
+		// 中间件链 chain
 		c.Next()
 	}
 }

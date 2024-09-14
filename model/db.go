@@ -36,6 +36,9 @@ func InitDb() {
 		},
 	})
 
+	// 设置gorm的LogMode为true 打印sql语句
+	db = db.Debug()
+
 	if err != nil {
 		fmt.Println("连接数据库失败，请检查参数：", err)
 		os.Exit(1)
