@@ -5,9 +5,12 @@ import (
 	"gopkg.in/ini.v1"
 )
 
+// 读取配置文件作为全局变量使用
 var (
-	AppMode    string
-	HttpPort   string
+	AppMode  string
+	HttpPort string
+	JwtKey   string
+
 	Db         string
 	DbHost     string
 	DbPort     string
@@ -32,6 +35,7 @@ func LoadServer(file *ini.File) {
 	// 如果config.ini取不到, 则使用默认值
 	AppMode = file.Section("server").Key("AppMode").MustString("debug")
 	HttpPort = file.Section("server").Key("HttpPort").MustString(":3000")
+	JwtKey = file.Section("server").Key("JwtKey").MustString("jwt")
 }
 
 func LoadData(file *ini.File) {
